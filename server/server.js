@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyparser = require('body-parser');
+const _ = require('lodash');
 
 const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
@@ -21,6 +22,19 @@ app.get('/todos',(req,res) => {
   });
 });
 
+
+app.post('/users',(req,res) => {
+  var body = _.pick(req.body,['email','password']);
+  var user = new UserModel(body);
+
+  user.save().then(() => {
+    return user.generateAuthToken();
+  }).then((token) => {
+      res.header('x-auth',token).send(user);
+  }).catch((e) => {
+    res.status(400).send(e);
+  })
+});
 
 app.get('/todos/:id',(req,res) => {
   if(ObjectID.isValid(req.params.id)) {
@@ -51,5 +65,5 @@ app.post('/todos',(req,res) => {
 });
 
 app.listen(PORT , () => {
-  console.log(`App running and listening on port {PORT}`)
+  console.log(`App running and listening on port ${PORT}`)
 });
