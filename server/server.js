@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyparser = require('body-parser');
 const _ = require('lodash');
+var {authenticate} = require('./middleware/authenticate')
 
 const {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose');
@@ -21,6 +22,11 @@ app.get('/todos',(req,res) => {
      res.send(e);
   });
 });
+
+
+app.get('/users/me',authenticate,(req,res) => {
+  res.send(req.user);
+})
 
 
 app.post('/users',(req,res) => {
